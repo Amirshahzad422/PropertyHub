@@ -59,7 +59,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
       child: Column(
         children: [
-          // Drag handle
           Center(
             child: Container(
               margin: const EdgeInsets.only(top: 12, bottom: 24),
@@ -213,7 +212,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
           ),
           
-          // Action Buttons
           Container(
             padding: EdgeInsets.only(
               left: 16, 

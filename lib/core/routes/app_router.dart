@@ -14,6 +14,7 @@ import 'package:propertyhub/presentation/screens/buyer/saved_screen.dart';
 import 'package:propertyhub/presentation/screens/shared/messages_screen.dart';
 import 'package:propertyhub/presentation/screens/shared/profile_screen.dart';
 import 'package:propertyhub/presentation/screens/owner/my_properties_screen.dart';
+import 'package:propertyhub/presentation/screens/shared/property_details_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -69,6 +70,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
       GoRoute(path: '/phone-auth', builder: (context, state) => const PhoneAuthScreen()),
       GoRoute(path: '/complete-profile', builder: (context, state) => const CompleteProfileScreen()),
+      
+      GoRoute(
+        path: '/property/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return PropertyDetailsScreen(propertyId: id);
+        },
+      ),
+
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {

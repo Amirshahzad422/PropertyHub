@@ -6,17 +6,13 @@ import 'package:propertyhub/data/repositories/property_repository.dart';
 class PropertyRepositoryImpl implements PropertyRepository {
   @override
   Future<List<PropertyModel>> getFeaturedProperties() async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 2));
-    // Return a subset as featured
     return MockData.properties.take(5).toList();
   }
 
   @override
   Future<List<PropertyModel>> getRecommendedProperties(String userId) async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 2));
-    // Ignore userId for now and return some recommended properties
     return MockData.properties.skip(5).take(5).toList();
   }
 
@@ -53,14 +49,12 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<void> toggleWishlist(String propertyId, String userId) async {
-    // Mock implementation, do nothing
     await Future.delayed(const Duration(milliseconds: 200));
   }
 
   @override
   Future<List<PropertyModel>> getWishlist(String userId) async {
     await Future.delayed(const Duration(seconds: 1));
-    // Return a few properties as wishlist for now
     return MockData.properties.take(2).toList();
   }
 }

@@ -13,10 +13,22 @@ final featuredPropertiesProvider = FutureProvider<List<PropertyModel>>((ref) {
   return repo.getFeaturedProperties();
 });
 
-final recommendedPropertiesProvider = FutureProvider<List<PropertyModel>>((ref) {
+final homeCategoryProvider = StateProvider<String>((ref) => 'For Sale');
+
+final homePropertiesProvider = FutureProvider<List<PropertyModel>>((ref) async {
+  final category = ref.watch(homeCategoryProvider);
   final repo = ref.watch(propertyRepositoryProvider);
-  // Using an empty userId since auth is not yet implemented
-  return repo.getRecommendedProperties('');
+  
+  // Use searchProperties to filter by category
+  final filter = PropertyFilter(category: category);
+  final properties = await repo.searchProperties(filter);
+  
+  // Fallback if empty
+  if (properties.isEmpty) {
+    return repo.getFeaturedProperties();
+  }
+  
+  return properties;
 });
 
 final propertyDetailsProvider = FutureProvider.family<PropertyModel?, String>((ref, id) {

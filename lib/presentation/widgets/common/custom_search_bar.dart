@@ -6,6 +6,7 @@ import 'package:propertyhub/core/themes/app_typography.dart';
 class CustomSearchBar extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
+  final VoidCallback? onFilterTap;
   final TextEditingController? controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
@@ -14,6 +15,7 @@ class CustomSearchBar extends StatelessWidget {
     super.key,
     this.readOnly = false,
     this.onTap,
+    this.onFilterTap,
     this.controller,
     this.hintText = 'Search by city, neighborhood...',
     this.onChanged,
@@ -60,6 +62,19 @@ class CustomSearchBar extends StatelessWidget {
                           style: AppTypography.bodyMedium,
                         ),
                 ),
+                if (onFilterTap != null)
+                  GestureDetector(
+                    onTap: onFilterTap,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                    ),
+                  ),
               ],
             ),
           ),

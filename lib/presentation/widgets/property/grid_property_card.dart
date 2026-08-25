@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
+import 'package:go_router/go_router.dart';
 import 'package:propertyhub/core/themes/app_typography.dart';
 import 'package:propertyhub/data/models/property_model.dart';
 
@@ -18,7 +19,7 @@ class GridPropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => context.push('/property/${property.id}'),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -35,7 +36,6 @@ class GridPropertyCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
             Expanded(
               flex: 5,
               child: Stack(
@@ -101,7 +101,6 @@ class GridPropertyCard extends StatelessWidget {
               ),
             ),
 
-            // Details Section 
             Expanded(
               flex: 4,
               child: Padding(
@@ -138,9 +137,12 @@ class GridPropertyCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
-                      child: Text(
-                        'View Details',
-                        style: AppTypography.labelMedium.copyWith(color: Colors.white),
+                      child: GestureDetector(
+                        onTap: () => context.push('/property/${property.id}'),
+                        child: Text(
+                          'View Details',
+                          style: AppTypography.labelMedium.copyWith(color: Colors.white),
+                        ),
                       ),
                     ),
                   ],

@@ -8,6 +8,10 @@ import 'package:propertyhub/presentation/widgets/common/filter_bottom_sheet.dart
 import 'package:propertyhub/presentation/widgets/common/loader_skeleton.dart';
 import 'package:propertyhub/presentation/widgets/property/property_card.dart';
 import 'package:propertyhub/presentation/widgets/property/grid_property_card.dart';
+import 'package:propertyhub/data/models/property_model.dart';
+import 'package:propertyhub/presentation/providers/map_provider.dart';
+import 'package:propertyhub/presentation/widgets/map/custom_map_view.dart';
+import 'package:propertyhub/presentation/widgets/map/map_carousel.dart';
 
 final viewModeProvider = StateProvider.autoDispose<int>((ref) => 0);
 
@@ -35,47 +39,27 @@ class SearchScreen extends ConsumerWidget {
                   ref.read(propertyFilterProvider.notifier).state = 
                       currentFilter.copyWith(query: value, clearQuery: value.isEmpty);
                 },
+                onFilterTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => FilterBottomSheet(
+                      initialFilter: currentFilter,
+                      onApply: (newFilter) {
+                        ref.read(propertyFilterProvider.notifier).state = newFilter;
+                      },
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  _buildViewToggle(context, ref, viewMode),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => FilterBottomSheet(
-                            initialFilter: currentFilter,
-                            onApply: (newFilter) {
-                              ref.read(propertyFilterProvider.notifier).state = newFilter;
-                            },
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.tune, color: Colors.white, size: 18),
-                      label: Text(
-                        'Filters',
-                        style: AppTypography.labelLarge.copyWith(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-                ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _buildViewToggle(context, ref, viewMode),
               ),
             ),
             const SizedBox(height: 24),
@@ -85,7 +69,7 @@ class SearchScreen extends ConsumerWidget {
                   if (properties.isEmpty) {
                     return _buildEmptyState();
                   }
-                  return _buildPropertyList(viewMode, properties, ref);
+                  return _buildContent(viewMode, properties, ref, context);
                 },
                 loading: () => _buildLoadingState(viewMode),
                 error: (err, stack) => _buildErrorState(ref),
@@ -112,8 +96,9 @@ class SearchScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          _buildToggleBtn(0, Icons.view_list_rounded, viewMode, ref),
-          _buildToggleBtn(1, Icons.grid_view_rounded, viewMode, ref),
+          Expanded(child: _buildToggleBtn(0, Icons.view_list_rounded, viewMode, ref)),
+          Expanded(child: _buildToggleBtn(1, Icons.grid_view_rounded, viewMode, ref)),
+          Expanded(child: _buildToggleBtn(2, Icons.map_rounded, viewMode, ref)),
         ],
       ),
     );
@@ -126,6 +111,7 @@ class SearchScreen extends ConsumerWidget {
         ref.read(viewModeProvider.notifier).state = index;
       },
       child: Container(
+        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.surfaceVariant : Colors.transparent,
@@ -168,7 +154,7 @@ class SearchScreen extends ConsumerWidget {
         itemCount: 3,
         itemBuilder: (context, index) => const PropertyCardSkeleton(),
       );
-    } else {
+    } else if (viewMode == 1) {
       return GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -180,6 +166,8 @@ class SearchScreen extends ConsumerWidget {
         itemCount: 6,
         itemBuilder: (context, index) => const GridPropertyCardSkeleton(),
       );
+    } else {
+      return const Center(child: CircularProgressIndicator());
     }
   }
 
@@ -200,7 +188,7 @@ class SearchScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPropertyList(int viewMode, List properties, WidgetRef ref) {
+  Widget _buildContent(int viewMode, List<PropertyModel> properties, WidgetRef ref, BuildContext context) {
     if (viewMode == 0) {
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -212,7 +200,7 @@ class SearchScreen extends ConsumerWidget {
           );
         },
       );
-    } else {
+    } else if (viewMode == 1) {
       return GridView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -229,6 +217,131 @@ class SearchScreen extends ConsumerWidget {
           );
         },
       );
+    } else {
+      return _buildMapView(properties, ref, context);
+    }
+  }
+
+  Widget _buildMapView(List<PropertyModel> properties, WidgetRef ref, BuildContext context) {
+    final cameraPosition = ref.watch(mapCameraPositionProvider);
+    final selectedProperty = ref.watch(selectedMapPropertyProvider);
+
+    return Stack(
+      children: [
+        CustomMapView(
+          properties: properties,
+          initialCameraPosition: cameraPosition,
+          onMarkerTap: (property) {
+            ref.read(selectedMapPropertyProvider.notifier).state = property;
+            _showNeighbourhoodInsights(property, ref, context);
+          },
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: MapCarousel(
+            properties: properties,
+            selectedProperty: selectedProperty,
+            searchQuery: ref.watch(propertyFilterProvider).query ?? '',
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showNeighbourhoodInsights(PropertyModel property, WidgetRef ref, BuildContext context) {
+    final placesAsync = ref.refresh(nearbyPlacesProvider(property.id));
+
+    placesAsync.whenOrNull(
+      data: (places) {
+        if (places.isEmpty) return;
+        if (!context.mounted) return;
+        _showNearbyPlacesBottomSheet(places, context);
+      },
+      error: (err, stack) {},
+    );
+  }
+
+  void _showNearbyPlacesBottomSheet(List<Map<String, dynamic>> places, BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Neighbourhood Insights',
+                style: AppTypography.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Places near this property',
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: places.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final place = places[index];
+                    return ListTile(
+                      leading: Icon(
+                        _getIconForType(place['type']),
+                        color: AppColors.primary,
+                      ),
+                      title: Text(place['name'] ?? 'Unknown'),
+                      subtitle: Text(place['vicinity'] ?? ''),
+                      trailing: Text(
+                        place['rating'] != 0.0 ? '⭐ ${place['rating'].toStringAsFixed(1)}' : '',
+                        style: AppTypography.labelMedium,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getIconForType(String? type) {
+    switch (type) {
+      case 'school':
+        return Icons.school;
+      case 'hospital':
+        return Icons.local_hospital;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'transit_station':
+        return Icons.directions_transit;
+      default:
+        return Icons.place;
     }
   }
 }

@@ -20,8 +20,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/search')) return 1;
     if (location.startsWith('/saved')) return 2;
-    if (location.startsWith('/messages')) return 3;
-    if (location.startsWith('/profile')) return 4;
+    if (location.startsWith('/profile')) return 3;
     return 0;
   }
 
@@ -45,9 +44,6 @@ class _AppShellState extends ConsumerState<AppShell> {
         context.go('/saved');
         break;
       case 3:
-        context.go('/messages');
-        break;
-      case 4:
         context.go('/profile');
         break;
     }
@@ -83,8 +79,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final buyerItems = const [
       BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
       BottomNavigationBarItem(icon: Icon(Icons.search), activeIcon: Icon(Icons.search, size: 28), label: 'Search'),
-      BottomNavigationBarItem(icon: Icon(Icons.favorite_outline), activeIcon: Icon(Icons.favorite), label: 'Wishlist'),
-      BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
+      BottomNavigationBarItem(icon: Icon(Icons.favorite_outline), activeIcon: Icon(Icons.favorite), label: 'Saved'),
       BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
     ];
 
@@ -95,16 +90,19 @@ class _AppShellState extends ConsumerState<AppShell> {
       BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
     ];
 
+    final showAppBar = !location.startsWith('/search');
+
     return Scaffold(
       extendBody: true, 
       extendBodyBehindAppBar: true,
-      appBar: GlassAppBar(
-        title: 'PropertyHub',
-        avatarUrl: authState.value?.profilePhotoUrl,
-        onAvatarTapped: () => context.go('/profile'),
-        onNotificationTapped: () {
-        },
-      ),
+      appBar: showAppBar
+          ? GlassAppBar(
+              title: 'PropertyHub',
+              avatarUrl: authState.value?.profilePhotoUrl,
+              onAvatarTapped: () => context.go('/profile'),
+              onNotificationTapped: () {},
+            )
+          : null,
       body: widget.child,
       bottomNavigationBar: GlassBottomNav(
         currentIndex: currentIndex,

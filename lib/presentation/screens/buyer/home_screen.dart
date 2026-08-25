@@ -14,7 +14,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recommendedAsync = ref.watch(recommendedPropertiesProvider);
+    final selectedCategory = ref.watch(homeCategoryProvider);
+    final propertiesAsync = ref.watch(homePropertiesProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 100), 
@@ -103,11 +104,20 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                CategoryChip(label: 'For Sale', isSelected: true),
+                GestureDetector(
+                  onTap: () => ref.read(homeCategoryProvider.notifier).state = 'For Sale',
+                  child: CategoryChip(label: 'For Sale', isSelected: selectedCategory == 'For Sale'),
+                ),
                 const SizedBox(width: 12),
-                CategoryChip(label: 'For Rent', isSelected: false),
+                GestureDetector(
+                  onTap: () => ref.read(homeCategoryProvider.notifier).state = 'For Rent',
+                  child: CategoryChip(label: 'For Rent', isSelected: selectedCategory == 'For Rent'),
+                ),
                 const SizedBox(width: 12),
-                CategoryChip(label: 'Commercial', isSelected: false),
+                GestureDetector(
+                  onTap: () => ref.read(homeCategoryProvider.notifier).state = 'Commercial',
+                  child: CategoryChip(label: 'Commercial', isSelected: selectedCategory == 'Commercial'),
+                ),
               ],
             ),
           ),
@@ -125,7 +135,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Based on your recent views',
+                  'Based on your selection',
                   style: AppTypography.bodyMedium,
                 ),
               ],
@@ -136,10 +146,10 @@ class HomeScreen extends ConsumerWidget {
           
           SizedBox(
             height: 420,
-            child: recommendedAsync.when(
+            child: propertiesAsync.when(
               data: (properties) {
                 if (properties.isEmpty) {
-                  return const Center(child: Text('No recommended properties found.'));
+                  return const Center(child: Text('No properties found.'));
                 }
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -177,7 +187,7 @@ class HomeScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Text('Failed to load properties', style: AppTypography.bodyLarge),
                     TextButton(
-                      onPressed: () => ref.refresh(recommendedPropertiesProvider),
+                      onPressed: () => ref.refresh(homePropertiesProvider),
                       child: const Text('Retry'),
                     ),
                   ],
