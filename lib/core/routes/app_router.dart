@@ -76,17 +76,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           // Buyer Routes
-          GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-          GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
-          GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
+          GoRoute(path: '/home', pageBuilder: (context, state) => const NoTransitionPage(child: HomeScreen())),
+          GoRoute(path: '/search', pageBuilder: (context, state) => const NoTransitionPage(child: SearchScreen())),
+          GoRoute(path: '/saved', pageBuilder: (context, state) => const NoTransitionPage(child: SavedScreen())),
           
           // Shared Routes
-          GoRoute(path: '/messages', builder: (context, state) => const MessagesScreen()),
-          GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+          GoRoute(path: '/messages', pageBuilder: (context, state) => const NoTransitionPage(child: MessagesScreen())),
+          GoRoute(path: '/profile', pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen())),
           
           // Owner Routes
-          GoRoute(path: '/owner-dashboard', builder: (context, state) => const OwnerDashboardScreen()),
-          GoRoute(path: '/my-properties', builder: (context, state) => const MyPropertiesScreen()),
+          GoRoute(path: '/owner-dashboard', pageBuilder: (context, state) => const NoTransitionPage(child: OwnerDashboardScreen())),
+          GoRoute(path: '/my-properties', pageBuilder: (context, state) => const NoTransitionPage(child: MyPropertiesScreen())),
         ],
       ),
     ],

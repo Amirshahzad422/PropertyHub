@@ -24,8 +24,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Container(
           color: AppColors.surface.withValues(alpha: 0.85),
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top,
-            bottom: 8,
+            top: MediaQuery.of(context).padding.top + 16,
+            bottom: 16,
             left: 24,
             right: 24,
           ),
@@ -70,5 +70,5 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 10);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 30);
 }

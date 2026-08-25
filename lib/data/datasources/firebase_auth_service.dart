@@ -81,16 +81,11 @@ class FirebaseAuthService {
     required String email,
     required String password,
   }) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      throw Exception('No user is currently signed in to link credentials to.');
-    }
-    
     final credential = EmailAuthProvider.credential(
       email: email,
       password: password,
     );
     
-    return await user.linkWithCredential(credential);
+    return await _auth.currentUser!.linkWithCredential(credential);
   }
 }

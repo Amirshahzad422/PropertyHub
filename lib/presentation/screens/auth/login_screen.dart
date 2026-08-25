@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
 import 'package:propertyhub/presentation/providers/auth_provider.dart';
-import 'package:propertyhub/presentation/widgets/cinematic_background.dart';
-import 'package:propertyhub/presentation/widgets/glass_container.dart';
-import 'package:propertyhub/presentation/widgets/primary_button.dart';
+import 'package:propertyhub/presentation/widgets/common/cinematic_background.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_container.dart';
+import 'package:propertyhub/presentation/widgets/common/primary_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -51,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 constraints: const BoxConstraints(maxWidth: 450),
                 child: Column(
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.06),
                     Text(
                       'PropertyHub',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(

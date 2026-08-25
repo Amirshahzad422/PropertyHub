@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
 import 'package:propertyhub/core/utils/validators.dart';
 import 'package:propertyhub/presentation/providers/auth_provider.dart';
-import 'package:propertyhub/presentation/widgets/cinematic_background.dart';
-import 'package:propertyhub/presentation/widgets/glass_container.dart';
-import 'package:propertyhub/presentation/widgets/primary_button.dart';
+import 'package:propertyhub/presentation/widgets/common/cinematic_background.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_container.dart';
+import 'package:propertyhub/presentation/widgets/common/primary_button.dart';
 import 'package:propertyhub/core/themes/app_typography.dart';
 
 class PhoneAuthScreen extends ConsumerStatefulWidget {
@@ -98,6 +98,9 @@ class _PhoneAuthScreenState extends ConsumerState<PhoneAuthScreen> {
         verificationId: _verificationId,
         smsCode: otp,
       );
+      if (mounted) {
+        context.go('/home'); 
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -167,7 +170,7 @@ class _PhoneAuthScreenState extends ConsumerState<PhoneAuthScreen> {
                   constraints: const BoxConstraints(maxWidth: 450),
                   child: Column(
                     children: [
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
                       Text(
                         'PropertyHub',
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(

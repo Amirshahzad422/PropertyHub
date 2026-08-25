@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
-import 'package:propertyhub/presentation/widgets/cinematic_background.dart';
+import 'package:propertyhub/presentation/widgets/common/cinematic_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

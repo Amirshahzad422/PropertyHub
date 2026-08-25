@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propertyhub/presentation/providers/auth_provider.dart';
-import 'package:propertyhub/presentation/widgets/glass_app_bar.dart';
-import 'package:propertyhub/presentation/widgets/glass_bottom_nav.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_app_bar.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_bottom_nav.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   final Widget child;

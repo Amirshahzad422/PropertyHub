@@ -31,11 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
       });
 
   @override
-  UserModel? get currentUser {
-    final user = _authService.getCurrentUser();
-    if (user == null) return null;
-    return null; 
-  }
+  UserModel? get currentUser => null; 
 
   @override
   Future<UserModel> signUpWithEmail({
@@ -213,6 +209,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
+      if (_authService.getCurrentUser() == null) {
+        throw Exception('No user is currently signed in to link credentials to.');
+      }
       final userCredential = await _authService.linkEmailAndPassword(
         email: email,
         password: password,

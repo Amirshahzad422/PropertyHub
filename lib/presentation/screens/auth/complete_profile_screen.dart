@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
 import 'package:propertyhub/core/utils/validators.dart';
 import 'package:propertyhub/presentation/providers/auth_provider.dart';
-import 'package:propertyhub/presentation/widgets/cinematic_background.dart';
-import 'package:propertyhub/presentation/widgets/glass_container.dart';
-import 'package:propertyhub/presentation/widgets/primary_button.dart';
+import 'package:propertyhub/presentation/widgets/common/cinematic_background.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_container.dart';
+import 'package:propertyhub/presentation/widgets/common/primary_button.dart';
 import 'package:propertyhub/core/themes/app_typography.dart';
 
 class CompleteProfileScreen extends ConsumerStatefulWidget {
@@ -24,6 +24,8 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   bool _isCheckingEmail = false;
   bool _emailValidAndNew = false;
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   String? _errorMessage;
 
   @override
@@ -175,7 +177,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
                   constraints: const BoxConstraints(maxWidth: 450),
                   child: Column(
                     children: [
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
                       Text(
                         'Secure Account',
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -227,20 +229,28 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
                             else ...[
                               TextField(
                                 controller: _passwordController,
-                                decoration: const InputDecoration(
+                                obscureText: _obscurePassword,
+                                decoration: InputDecoration(
                                   hintText: 'Create Password',
-                                  prefixIcon: Icon(Icons.lock_outline),
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  ),
                                 ),
-                                obscureText: true,
                               ),
                               const SizedBox(height: 16),
                               TextField(
                                 controller: _confirmPasswordController,
-                                decoration: const InputDecoration(
+                                obscureText: _obscureConfirmPassword,
+                                decoration: InputDecoration(
                                   hintText: 'Confirm Password',
-                                  prefixIcon: Icon(Icons.lock_outline),
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                                  ),
                                 ),
-                                obscureText: true,
                               ),
                               const SizedBox(height: 24),
                               PrimaryButton(

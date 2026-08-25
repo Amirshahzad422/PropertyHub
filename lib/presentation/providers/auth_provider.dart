@@ -33,13 +33,13 @@ final currentUserProvider = Provider<UserModel?>((ref) {
 
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<UserModel?>>((ref) {
-  return AuthNotifier(ref);
+  return AuthNotifier(ref.watch(authRepositoryProvider));
 });
 
 class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
-  final Ref ref;
+  final AuthRepository _authRepository;
 
-  AuthNotifier(this.ref) : super(const AsyncValue.data(null));
+  AuthNotifier(this._authRepository) : super(const AsyncValue.data(null));
 
   Future<void> signUpWithEmail({
     required String email,
@@ -48,8 +48,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final user = await authRepo.signUpWithEmail(
+      final user = await _authRepository.signUpWithEmail(
         email: email,
         password: password,
         role: role,
@@ -66,8 +65,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final user = await authRepo.signInWithEmail(
+      final user = await _authRepository.signInWithEmail(
         email: email,
         password: password,
       );
@@ -77,15 +75,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
-
   Future<void> signInWithPhone({
     required String verificationId,
     required String smsCode,
   }) async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final user = await authRepo.signInWithPhone(
+      final user = await _authRepository.signInWithPhone(
         verificationId: verificationId,
         smsCode: smsCode,
       );
@@ -98,8 +94,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.signOut();
+      await _authRepository.signOut();
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -109,9 +104,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   Future<void> signInWithGoogle() async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final user = await authRepo.signInWithGoogle();
-      ref.invalidate(authStateProvider);
+      final user = await _authRepository.signInWithGoogle();
       state = AsyncValue.data(user);
     } catch (e, st) {
       if (e.toString().contains('Google Sign-In aborted') || e.toString().contains('popup_closed_by_user')) {
@@ -128,8 +121,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     required Function(String error) verificationFailed,
   }) async {
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.sendPhoneOTP(
+      await _authRepository.sendPhoneOTP(
         phoneNumber: phoneNumber,
         codeSent: codeSent,
         verificationFailed: verificationFailed,
@@ -141,8 +133,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.sendPasswordResetEmail(email: email);
+      await _authRepository.sendPasswordResetEmail(email: email);
     } catch (e) {
       throw Exception('Failed to send reset email: $e');
     }
@@ -150,8 +141,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   Future<void> updateUser(UserModel user) async {
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final updatedUser = await authRepo.updateUserProfile(user);
+      final updatedUser = await _authRepository.updateUserProfile(user);
       state = AsyncValue.data(updatedUser);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -160,8 +150,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   Future<bool> checkEmailExists(String email) async {
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      return await authRepo.checkEmailExists(email);
+      return await _authRepository.checkEmailExists(email);
     } catch (e) {
       throw Exception('Failed to check email: $e');
     }
@@ -173,8 +162,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      final user = await authRepo.linkEmailToAccount(
+      final user = await _authRepository.linkEmailToAccount(
         email: email,
         password: password,
       );

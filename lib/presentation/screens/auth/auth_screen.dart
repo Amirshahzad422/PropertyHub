@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:propertyhub/core/themes/app_colors.dart';
 import 'package:propertyhub/core/utils/validators.dart';
 import 'package:propertyhub/presentation/providers/auth_provider.dart';
-import 'package:propertyhub/presentation/widgets/cinematic_background.dart';
-import 'package:propertyhub/presentation/widgets/glass_container.dart';
-import 'package:propertyhub/presentation/widgets/primary_button.dart';
+import 'package:propertyhub/presentation/widgets/common/cinematic_background.dart';
+import 'package:propertyhub/presentation/widgets/common/glass_container.dart';
+import 'package:propertyhub/presentation/widgets/common/primary_button.dart';
 import 'package:propertyhub/core/themes/app_typography.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -26,6 +26,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   int _selectedRole = 1;
+  bool _obscurePassword = true;
   String? _errorMessage;
 
   @override
@@ -225,11 +226,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
           const SizedBox(height: 16),
           TextField(
             controller: _passwordController,
-            decoration: const InputDecoration(
+            obscureText: _obscurePassword,
+            decoration: InputDecoration(
               hintText: 'Password',
-              prefixIcon: Icon(Icons.lock_outline),
+              prefixIcon: const Icon(Icons.lock_outline),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
             ),
-            obscureText: true,
           ),
           const SizedBox(height: 16),
           PrimaryButton(
@@ -384,11 +396,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
           const SizedBox(height: 16),
           TextField(
             controller: _passwordController,
-            decoration: const InputDecoration(
+            obscureText: _obscurePassword,
+            decoration: InputDecoration(
               hintText: 'Password',
-              prefixIcon: Icon(Icons.lock_outline),
+              prefixIcon: const Icon(Icons.lock_outline),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
             ),
-            obscureText: true,
           ),
           const SizedBox(height: 16),
           PrimaryButton(
@@ -444,7 +467,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with SingleTickerProvid
                 constraints: const BoxConstraints(maxWidth: 450),
                 child: Column(
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                    SizedBox(height: MediaQuery.sizeOf(context).height * 0.06),
                     Text(
                       'PropertyHub',
                       style: Theme.of(context).textTheme.headlineLarge?.copyWith(
