@@ -157,6 +157,22 @@ class _PropertyDetailsContent extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (property.panorama360Url != null && property.panorama360Url!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.threesixty, color: AppColors.primary, size: 20),
+                      onPressed: () {
+                        context.push('/panorama/${property.id}');
+                      },
+                    ),
+                  ),
+                ),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
@@ -164,16 +180,22 @@ class _PropertyDetailsContent extends ConsumerWidget {
                 children: [
                   PropertyImageGallery(photos: property.photos),
                   
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.threesixty, color: Colors.white, size: 32),
-                    ),
-                  ),
+                  // if (property.panorama360Url != null && property.panorama360Url!.isNotEmpty)
+                  //   Center(
+                  //     child: GestureDetector(
+                  //       onTap: () {
+                  //         context.push('/panorama/${property.id}');
+                  //       },
+                  //       child: Container(
+                  //         padding: const EdgeInsets.all(16),
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.black.withValues(alpha: 0.4),
+                  //           shape: BoxShape.circle,
+                  //         ),
+                  //         child: const Icon(Icons.threesixty, color: Colors.white, size: 32),
+                  //       ),
+                  //     ),
+                  //   ),
 
                   Positioned(
                     bottom: 20,

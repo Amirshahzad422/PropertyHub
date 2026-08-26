@@ -15,7 +15,10 @@ import 'package:propertyhub/presentation/screens/shared/messages_screen.dart';
 import 'package:propertyhub/presentation/screens/shared/profile_screen.dart';
 import 'package:propertyhub/presentation/screens/owner/my_properties_screen.dart';
 import 'package:propertyhub/presentation/screens/shared/property_details_screen.dart';
-
+import 'package:propertyhub/presentation/screens/shared/chat_detail_screen.dart';
+import 'package:propertyhub/presentation/screens/shared/panorama_tour_screen.dart';
+import 'package:propertyhub/core/themes/app_typography.dart';
+import 'package:propertyhub/presentation/providers/property_provider.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -76,6 +79,53 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return PropertyDetailsScreen(propertyId: id);
+        },
+      ),
+
+      GoRoute(
+        path: '/chat-detail/:chatId',
+        builder: (context, state) {
+          final chatId = state.pathParameters['chatId']!;
+          return ChatDetailScreen(chatId: chatId);
+        },
+      ),
+
+      GoRoute(
+        path: '/panorama/:propertyId',
+        builder: (context, state) {
+          final id = state.pathParameters['propertyId']!;
+          return Consumer(
+            builder: (context, ref, child) {
+              final propertyAsync = ref.watch(propertyDetailsProvider(id));
+              return propertyAsync.when(
+                loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+                error: (err, stack) => Scaffold(
+                  body: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text('Failed to load property', style: AppTypography.bodyLarge),
+                        TextButton(
+                          onPressed: () => ref.refresh(propertyDetailsProvider(id)),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                data: (property) {
+                  if (property == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Property not found')),
+                    );
+                  }
+                  return PanoramaTourScreen(property: property);
+                },
+              );
+            },
+          );
         },
       ),
 

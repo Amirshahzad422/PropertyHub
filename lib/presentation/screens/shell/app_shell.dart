@@ -97,12 +97,21 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     final showAppBar = !location.startsWith('/search');
 
+    String getAppBarTitle(String loc) {
+      if (loc.startsWith('/messages')) return 'Messages';
+      if (loc.startsWith('/profile')) return 'Profile';
+      if (loc.startsWith('/saved')) return 'Wishlist';
+      if (loc.startsWith('/owner-dashboard')) return 'Dashboard';
+      if (loc.startsWith('/my-properties')) return 'My Properties';
+      return 'PropertyHub';
+    }
+
     return Scaffold(
       extendBody: true, 
       extendBodyBehindAppBar: true,
       appBar: showAppBar
           ? GlassAppBar(
-              title: 'PropertyHub',
+              title: getAppBarTitle(location),
               avatarUrl: authState.value?.profilePhotoUrl,
               onAvatarTapped: () => context.go('/profile'),
               onNotificationTapped: () {},
