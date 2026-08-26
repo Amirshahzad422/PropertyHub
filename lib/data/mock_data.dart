@@ -24,6 +24,7 @@ class MockData {
       required GeoPoint location,
       bool isVerified = false,
       int viewsCount = 0,
+      String? panorama360Url,
     }) {
       final geohash = GeoFirePoint(location).geohash;
       return PropertyModel(
@@ -44,6 +45,7 @@ class MockData {
         geohash: geohash,
         isVerified: isVerified,
         viewsCount: viewsCount,
+        panorama360Url: panorama360Url,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -57,8 +59,13 @@ class MockData {
         price: 45000000, bedrooms: 0, bathrooms: 2, area: 1200, city: 'Lahore, Punjab',
         description: 'Prime commercial space in Gulberg.',
         amenities: ['Parking', 'Security'],
-        photos: ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab'],
+        photos: [
+          'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab',
+          'https://images.unsplash.com/photo-1577495508048-b635879837f1',
+          'https://images.unsplash.com/photo-1554469384-e58fac16e23a'
+        ],
         location: const GeoPoint(31.5100, 74.3400), isVerified: true, viewsCount: 120,
+        panorama360Url: 'https://pannellum.org/images/alma.jpg',
       ),
       createProperty(
         id: '2', ownerId: 'o2',
@@ -66,8 +73,12 @@ class MockData {
         price: 18000000, bedrooms: 3, bathrooms: 3, area: 2200, city: 'Lahore, Punjab',
         description: 'Luxury living on MM Alam road.',
         amenities: ['Gym', 'Pool'],
-        photos: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00'],
+        photos: [
+          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
+          'https://images.unsplash.com/photo-1512917774080-9991f1c4c750'
+        ],
         location: const GeoPoint(31.5120, 74.3420), isVerified: true, viewsCount: 45,
+        panorama360Url: 'https://pannellum.org/images/alma.jpg',
       ),
       createProperty(
         id: '3', ownerId: 'o3',
@@ -77,6 +88,7 @@ class MockData {
         amenities: ['Furnished'],
         photos: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267'],
         location: const GeoPoint(31.5150, 74.3450), isVerified: false, viewsCount: 15,
+        panorama360Url: 'https://pannellum.org/images/alma.jpg',
       ),
       // LAHORE - DHA CLUSTER
       createProperty(
