@@ -25,6 +25,8 @@ class PropertyModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  bool get isJustListed => DateTime.now().difference(createdAt).inDays <= 7;
+
   PropertyModel({
     required this.id,
     required this.ownerId,

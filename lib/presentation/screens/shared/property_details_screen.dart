@@ -5,8 +5,14 @@ import 'package:propertyhub/core/themes/app_colors.dart';
 import 'package:propertyhub/core/themes/app_typography.dart';
 import 'package:propertyhub/data/models/property_model.dart';
 import 'package:propertyhub/presentation/providers/property_provider.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:propertyhub/presentation/widgets/map/custom_map_view.dart';
+import 'package:propertyhub/presentation/widgets/property/neighbourhood_insights.dart';
+import 'package:propertyhub/presentation/widgets/property/verified_badge.dart';
+import 'package:propertyhub/presentation/widgets/property/just_listed_badge.dart';
+import 'package:propertyhub/presentation/widgets/property/property_image_gallery.dart';
+import 'package:propertyhub/presentation/widgets/property/property_key_features.dart';
+import 'package:propertyhub/presentation/widgets/property/property_description.dart';
+import 'package:propertyhub/presentation/widgets/property/property_owner_info.dart';
+import 'package:propertyhub/presentation/widgets/property/property_bottom_bar.dart';
 
 class PropertyDetailsScreen extends ConsumerWidget {
   final String propertyId;
@@ -108,13 +114,13 @@ class _NotFoundState extends StatelessWidget {
   }
 }
 
-class _PropertyDetailsContent extends StatelessWidget {
+class _PropertyDetailsContent extends ConsumerWidget {
   final PropertyModel property;
 
   const _PropertyDetailsContent({required this.property});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
@@ -156,7 +162,7 @@ class _PropertyDetailsContent extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  _buildImageGallery(),
+                  PropertyImageGallery(photos: property.photos),
                   
                   Center(
                     child: Container(
@@ -175,39 +181,11 @@ class _PropertyDetailsContent extends StatelessWidget {
                     child: Row(
                       children: [
                         if (property.isVerified)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryContainer,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.verified_outlined, color: AppColors.onSecondaryContainer, size: 14),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'VERIFIED',
-                                  style: AppTypography.labelSmall.copyWith(
-                                    color: AppColors.onSecondaryContainer,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            'Just Listed',
-                            style: AppTypography.labelSmall.copyWith(color: Colors.white),
-                          ),
-                        ),
+                          const VerifiedBadge(),
+                        if (property.isVerified && property.isJustListed)
+                          const SizedBox(width: 8),
+                        if (property.isJustListed)
+                          const JustListedBadge(),
                       ],
                     ),
                   ),
@@ -250,16 +228,16 @@ class _PropertyDetailsContent extends StatelessWidget {
                   const Divider(height: 1, color: AppColors.surfaceVariant),
                   const SizedBox(height: 24),
 
-                  _buildKeyFeatures(),
+                  PropertyKeyFeatures(property: property),
                   const SizedBox(height: 32),
 
-                  _buildDescription(),
+                  PropertyDescription(property: property),
                   const SizedBox(height: 32),
 
-                  _buildOwnerInfo(),
+                  PropertyOwnerInfo(property: property),
                   const SizedBox(height: 32),
 
-                  _buildNeighborhood(),
+                  NeighbourhoodInsights(propertyId: property.id),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -267,280 +245,7 @@ class _PropertyDetailsContent extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomBar(),
-    );
-  }
-
-  Widget _buildImageGallery() {
-    final photos = property.photos;
-    if (photos.isEmpty) {
-      return Container(
-        color: Colors.grey[200],
-        child: const Icon(Icons.broken_image, size: 64, color: Colors.grey),
-      );
-    }
-
-    return PageView.builder(
-      itemCount: photos.length,
-      itemBuilder: (context, index) {
-        return Image.network(
-          photos[index],
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            color: Colors.grey[200],
-            child: const Icon(Icons.broken_image, size: 48, color: Colors.grey),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildKeyFeatures() {
-    return Row(
-      children: [
-        Expanded(child: _buildFeatureCard(Icons.bed_outlined, '${property.bedrooms}', 'BEDROOMS')),
-        const SizedBox(width: 12),
-        Expanded(child: _buildFeatureCard(Icons.bathtub_outlined, '${property.bathrooms}', 'BATHROOMS')),
-        const SizedBox(width: 12),
-        Expanded(child: _buildFeatureCard(Icons.square_foot_outlined, '${property.area.toInt()}', 'SQUARE FEET')),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCard(IconData icon, String value, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 20, color: AppColors.charcoalText),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    label,
-                    style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    value,
-                    style: AppTypography.titleLarge.copyWith(
-                      color: AppColors.charcoalText,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDescription() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'About this property',
-          style: AppTypography.headlineSmall.copyWith(
-            color: AppColors.charcoalText,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          property.description.isEmpty 
-              ? 'A masterclass in modern architecture, this property offers an unparalleled living experience. Blending organic materials with cutting-edge technology, it is designed for those who appreciate luxury.'
-              : property.description,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.onSurfaceVariant,
-            height: 1.6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOwnerInfo() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Contact Agent',
-            style: AppTypography.headlineSmall.copyWith(
-              color: AppColors.charcoalText,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 28,
-                backgroundImage: NetworkImage('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80'),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Eleanor Vance',
-                      style: AppTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.charcoalText,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Senior Partner, Luxury Division',
-                      style: AppTypography.labelMedium.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.calendar_today_outlined, size: 16),
-              label: const Text('Schedule Visit'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.chat_bubble_outline, size: 16),
-              label: const Text('Chat with Owner'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNeighborhood() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Neighborhood',
-          style: AppTypography.headlineSmall.copyWith(
-            color: AppColors.charcoalText,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: CustomMapView(
-              properties: [property],
-              initialCameraPosition: CameraPosition(
-                target: LatLng(property.location.latitude, property.location.longitude),
-                zoom: 14,
-              ),
-              onMarkerTap: (_) {}, 
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: const Border(
-          top: BorderSide(color: AppColors.surfaceVariant),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                label: const Text('Chat'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.calendar_month_outlined, size: 18),
-                label: const Text('Visit'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const PropertyBottomBar(),
     );
   }
 }

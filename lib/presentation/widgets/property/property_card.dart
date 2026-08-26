@@ -4,6 +4,8 @@ import 'package:propertyhub/core/themes/app_typography.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:propertyhub/data/models/property_model.dart';
+import 'package:propertyhub/presentation/widgets/property/verified_badge.dart';
+import 'package:propertyhub/presentation/widgets/property/just_listed_badge.dart';
 
 class PropertyCard extends StatelessWidget {
   final PropertyModel property;
@@ -61,27 +63,16 @@ class PropertyCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (property.isVerified)
+                    if (property.isVerified || property.isJustListed)
                       Positioned(
                         top: 16,
                         left: 16,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondaryContainer.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.verified, color: Colors.white, size: 14),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Verified',
-                                style: AppTypography.labelMedium.copyWith(color: Colors.white),
-                              ),
-                            ],
-                          ),
+                        child: Row(
+                          children: [
+                            if (property.isVerified) const VerifiedBadge(),
+                            if (property.isVerified && property.isJustListed) const SizedBox(width: 8),
+                            if (property.isJustListed) const JustListedBadge(),
+                          ],
                         ),
                       ),
                     Positioned(
